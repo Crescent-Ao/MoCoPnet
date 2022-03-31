@@ -1,6 +1,61 @@
 from data_utils import *
 import matplotlib.pyplot as plt
 import imresize
+class SirAugDataset(Dataset):
+    def __init__(self, img_path, scale_factor, input_num):
+        super().__init__()
+        self.img_path = img_path
+        self.upscale_factor = scale_factor
+        self.totensor = transforms.ToTensor()
+        self.input_num = input_num
+        self
+    def __getitem__(self, idx):
+        LR = []
+        for i in range(self.input_num):
+            img_LR = Image.open(self.img_path)
+            img_LR = np.array(img_LR,dtype = np.float32)/255.0
+            img_LR = np.array(img_LR,dtype = np.float32)[np.newaxis,:]
+            LR.append(img_LR)
+        LR = np.stack(LR,0)
+        LR = torch.from_numpy(np.ascontiguousarray(LR.copy()))
+        return LR
+    def __len__(self):
+        return 2
+
+        """
+        for idx_frame in range(idx - self.input_num//2, idx + self.input_num//2+1):
+            if idx_frame < 0:
+                idx_frame = 0
+            if idx_frame > len(self.img_list) - 1:
+                idx_frame = len(self.img_list) - 1
+            try:
+                img_HR = Image.open(self.dataset_dir + '/' + str(idx_frame) + '.png')
+                img_HR = np.array(img_HR, dtype=np.float32)/255.0
+            except:
+                img_HR = Image.open(self.dataset_dir + '/' + str(idx_frame) + '.bmp')
+                img_HR = np.array(img_HR, dtype=np.float32)/255.0
+                img_HR = img_HR[:,:,0]
+            # img_HR = np.array(img_HR, dtype=np.float32)/255.0
+            img_LR = imresize.imresize(img_HR, 1/self.upscale_factor, method='bicubic')
+            bicubic1 = imresize.imresize(img_LR, self.upscale_factor, method='bicubic')
+            img_HR = np.array(img_HR, dtype=np.float32)[np.newaxis,:]
+            img_LR = np.array(img_LR, dtype=np.float32)[np.newaxis,:]
+            bicubic.append(np.array(bicubic1, dtype=np.float32)[np.newaxis,:])
+            HR.append(img_HR)
+            LR.append(img_LR)
+            
+        HR = np.stack(HR, 0)
+        LR = np.stack(LR, 0)
+        bicubic = np.stack(bicubic, 0)
+        
+        HR = torch.from_numpy(np.ascontiguousarray(HR.copy()))
+        LR = torch.from_numpy(np.ascontiguousarray(LR.copy()))
+        bicubic = torch.from_numpy(np.ascontiguousarray(bicubic.copy()))
+        return LR, HR
+
+    def __len__(self):
+        return len(self.img_list)
+"""
 
 class TrainSetLoader(Dataset):
     def __init__(self, cfg):

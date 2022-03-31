@@ -9,7 +9,7 @@ import numpy as np
 from tqdm import tqdm
 
 parser = argparse.ArgumentParser(description="PyTorch MoCoPnet")
-parser.add_argument("--datasets", type=str, default=['SAITD','Hui','Anti-UAV'], help="Test datasets")
+parser.add_argument("--datasets", type=str, default=['SAITD','Hui'], help="Test datasets")
 parser.add_argument("--save_img", type=bool, default=False, help="save super-resolved images")
 parser.add_argument("--save_dir", type=str, default='./results/', help="save path")
 parser.add_argument("--ckpt", default='./log/MoCoPnet.pth.tar', type=str, help="checkpoint path")
@@ -28,7 +28,9 @@ def demo_test(net, test_loader, video_name):
     with torch.no_grad():
         for idx_iter, (LR, HR) in enumerate(test_loader):
             LR, HR = Variable(LR).to(opt.device), Variable(HR).to(opt.device)
+            print(LR.shape)
             SR = net(LR)
+          #  print(SR.shape)
             SR = torch.clamp(SR, 0, 1)
             
             # save images
@@ -73,6 +75,7 @@ def main():
     net.load_state_dict(ckpt['state_dict'])
         
     net = net.to(opt.device)
+    print('initialize finished')
     for i in range(len(opt.datasets)):
         opt.dataset = opt.datasets[i]
         valid(net, opt.dataset)
